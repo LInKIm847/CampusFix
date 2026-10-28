@@ -1,0 +1,67 @@
+@model CampusFix.Models.MaintenanceRequest
+
+@{
+    ViewData["Title"] = "Request Details";
+}
+
+<h2>Request Details</h2>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success" role="status" aria-live="polite">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Title</dt>
+        <dd class="col-sm-10">@Model.Title</dd>
+
+        <dt class="col-sm-2">Description</dt>
+        <dd class="col-sm-10">@Model.Description</dd>
+
+        <dt class="col-sm-2">Location</dt>
+        <dd class="col-sm-10">@Model.Location</dd>
+
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Model.Status</dd>
+
+        <dt class="col-sm-2">Priority</dt>
+        <dd class="col-sm-10">@Model.Priority</dd>
+
+        <dt class="col-sm-2">Category</dt>
+        <dd class="col-sm-10">@(Model.Category != null ? Model.Category.Name : "-")</dd>
+
+        <dt class="col-sm-2">Submitted By</dt>
+        <dd class="col-sm-10">@(Model.User != null ? Model.User.UserName : "-")</dd>
+
+        <dt class="col-sm-2">Created</dt>
+        <dd class="col-sm-10">@Model.DateCreated.ToString("yyyy-MM-dd")</dd>
+    </dl>
+</div>
+
+@if (User.IsInRole("Maintenance") || User.IsInRole("Administrator"))
+{
+    <div class="card card-body mb-3">
+        <h3 class="h5">Update request status</h3>
+        <form asp-action="UpdateStatus" method="post" class="d-flex flex-column flex-sm-row gap-2">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <select name="status" class="form-select" aria-label="New request status">
+                @foreach (CampusFix.Models.RequestStatus status in Enum.GetValues(typeof(CampusFix.Models.RequestStatus)))
+                {
+                    <option value="@status" selected="@(status == Model.Status)">@status</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary">Save status</button>
+        </form>
+    </div>
+}
+
+@if (User.IsInRole("Maintenance") || User.IsInRole("Administrator") || Model.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+{
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
+}

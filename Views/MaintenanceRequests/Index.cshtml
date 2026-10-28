@@ -1,0 +1,63 @@
+@model IEnumerable<CampusFix.Models.MaintenanceRequest>
+
+@{
+    ViewData["Title"] = "Maintenance Requests";
+}
+
+<h2>Maintenance Requests</h2>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+@if (User.IsInRole("Student") || User.IsInRole("Administrator"))
+{
+    <p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
+}
+@if (User.IsInRole("Maintenance") || User.IsInRole("Administrator"))
+{
+    <p><a asp-action="MaintenanceDashboard" class="btn btn-outline-primary">Maintenance Dashboard</a></p>
+}
+
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Category</th>
+            @if (User.IsInRole("Maintenance") || User.IsInRole("Administrator"))
+            {
+                <th>Student</th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Location</td>
+                <td>@item.Status</td>
+                <td>@item.Priority</td>
+                <td>@(item.Category?.Name ?? "-")</td>
+                @if (User.IsInRole("Maintenance") || User.IsInRole("Administrator"))
+                {
+                    <td>@(item.User?.UserName ?? "-")</td>
+                }
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
